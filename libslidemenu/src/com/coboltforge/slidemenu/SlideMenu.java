@@ -1,18 +1,27 @@
-
+/**
+ * A sliding menu for Android, very much like the Google+ and Facebook apps have.
+ * 
+ * Based upon the great work done by stackoverflow user Scirocco (http://stackoverflow.com/a/11367825/361413)
+ * Some code also taken from https://github.com/darvds/RibbonMenu, thanks!
+ */
 package com.coboltforge.slidemenu;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 
+import org.apache.http.util.ExceptionUtils;
 import org.xmlpull.v1.XmlPullParser;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.XmlResourceParser;
+import android.graphics.Rect;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -24,7 +33,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 public class SlideMenu {
-	//just a simple adapter
+	
+	// a simple adapter
 	public static class SlideMenuAdapter extends ArrayAdapter<SlideMenu.SlideMenuAdapter.MenuDesc> {
 		Activity act;
 		SlideMenu.SlideMenuAdapter.MenuDesc[] items;
@@ -64,6 +74,7 @@ public class SlideMenu {
 	}
 
 	private static boolean menuShown = false;
+	private int statusHeight;
 	private static View menu;
 	private static LinearLayout content;
 	private static FrameLayout parent;
@@ -127,6 +138,33 @@ public class SlideMenu {
 	 * Slide the menu in.
 	 */
 	public void show() {
+		/*
+		 *  only have to adopt to status height if there is no action bar,
+		 *  neither native nor from support library!
+		 */
+		try {
+			Method getActionBar = act.getClass().getMethod("getActionBar", (Class[])null);
+			Object ab = getActionBar.invoke(act, (Object[])null);
+			ab.toString(); // check for null
+		} catch (Exception e) {
+			try {
+			// there is no native actionbar, try the support one
+			Method getActionBar = act.getClass().getMethod("getSupportActionBar", (Class[])null);
+			Object sab = getActionBar.invoke(act, (Object[])null);
+			sab.toString(); // check for null
+			}
+			catch(Exception es) {
+				// there also is no support action bar!
+				Rect r = new Rect();
+				Window window = act.getWindow();
+				window.getDecorView().getWindowVisibleDisplayFrame(r);
+				statusHeight = r.top;
+			}
+		}
+
+		/*
+		 * phew, finally!
+		 */
 		this.show(true);
 	}
 	
@@ -149,7 +187,7 @@ public class SlideMenu {
 		LayoutInflater inflater = (LayoutInflater) act.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		menu = inflater.inflate(R.layout.slidemenu, null);
 		FrameLayout.LayoutParams lays = new FrameLayout.LayoutParams(-1, -1, 3);
-		lays.setMargins(0, 0, 0, 0);
+		lays.setMargins(0, statusHeight, 0, 0);
 		menu.setLayoutParams(lays);
 		parent.addView(menu);
 		
