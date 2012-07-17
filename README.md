@@ -1,4 +1,5 @@
 A sliding menu for Android, very much like the Google+ and Facebook apps have.
+That is, this one slides the activity title / action bar out of the way as well!
 
 Based upon the great work done by stackoverflow user Scirocco (http://stackoverflow.com/a/11367825/361413),
 thanks a lot!
