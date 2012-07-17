@@ -6,7 +6,6 @@
     <LinearLayout
         android:layout_width="250dip"
         android:layout_height="fill_parent"
-        android:background="@android:color/black"
         android:orientation="vertical" >
 
         <ImageView
@@ -14,13 +13,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal" 
-            android:padding="5dip"/>
+            />
 
         <ListView
             android:id="@+id/menu_listview"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:divider="@android:color/black"
+            android:divider="@android:color/darker_gray"
             android:dividerHeight="1dip" />
     </LinearLayout>
 
