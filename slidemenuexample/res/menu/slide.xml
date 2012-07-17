@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/item_one"
+        android:icon="@drawable/ic_launcher"
+        android:title="@string/item_one">
+    </item>
+    <item
+        android:id="@+id/item_two"
+        android:icon="@drawable/ic_launcher"
+        android:title="@string/item_two">
+    </item>
+    <item
+        android:id="@+id/item_three"
+        android:icon="@drawable/ic_launcher"
+        android:title="@string/item_three">
+    </item>
+    <item
+        android:id="@+id/item_four"
+        android:icon="@drawable/ic_launcher"
+        android:title="@string/item_four">
+    </item>
+
+</menu>

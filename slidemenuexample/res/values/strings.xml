@@ -1,0 +1,10 @@
+<resources>
+
+    <string name="app_name">SlideMenuExample</string>
+    <string name="item_one">Menu Item One</string>
+    <string name="item_two">Menu Item Two</string>
+    <string name="item_three">Menu Item Three</string>
+    <string name="item_four">Menu Item Four</string>
+    <string name="menubutton">If you do not happen to have an ActionBar, click here to activate the SlideMenu!</string>
+
+</resources>
