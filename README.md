@@ -24,7 +24,7 @@ The sample activity shows how it all works.
 Credit
 ======
 
-Thanks go out to stackoverflow user scirocoo (http://stackoverflow.com/users/1150188/scirocco)
+Thanks go out to stackoverflow user scirocco (http://stackoverflow.com/users/1150188/scirocco)
 whose work we just slightly extended and also to David Scott for the XML parsing code in RibbonMenu
 (https://github.com/darvds/RibbonMenu) that we used to complete this implementation.
 
