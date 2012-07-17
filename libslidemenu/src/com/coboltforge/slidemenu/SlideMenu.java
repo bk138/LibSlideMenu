@@ -87,7 +87,7 @@ public class SlideMenu {
 	 * @param cb Callback to be invoked on menu item click.
 	 * @param slideDuration Slide in/out duration in milliseconds.
 	 */
-	SlideMenu(Activity act, int menuResource, SlideMenuInterface.OnSlideMenuItemClickListener cb, int slideDuration) {
+	public SlideMenu(Activity act, int menuResource, SlideMenuInterface.OnSlideMenuItemClickListener cb, int slideDuration) {
 		this.act = act;
 		this.callback = cb;
 	
