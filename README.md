@@ -6,8 +6,9 @@ thanks a lot!
 
 The XML parsing code comes from https://github.com/darvds/RibbonMenu, thanks!
 
-![SlideMenu](https://github.com/bk138/LibSlideMenu/raw/master/screenshot1.png)
+![SlideMenu on Gingerbread](https://github.com/bk138/LibSlideMenu/raw/master/screenshot1.png)
 
+![SlideMenu on ICS with ActionBar](https://github.com/bk138/LibSlideMenu/raw/master/screenshot2.png)
 
 Usage
 =====
