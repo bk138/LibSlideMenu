@@ -90,7 +90,6 @@ public class SlideMenu {
 		}
 	}
 
-	private static boolean menuShown = false;
 	private int statusHeight;
 	private static View menu;
 	private static LinearLayout content;
@@ -169,12 +168,6 @@ public class SlideMenu {
 	}
 	
 	
-	//call this in your onCreate() for screen rotation
-	public void checkEnabled() {
-		//TODO crashes on restart, should be done internally anyway
-//		if(menuShown)
-//			this.show(false);
-	}
 	
 	/**
 	 * Slide the menu in.
@@ -271,7 +264,6 @@ public class SlideMenu {
 		});
 		enableDisableViewGroup((LinearLayout) parent.findViewById(android.R.id.content).getParent(), false);
 
-		menuShown = true;
 	}
 	
 	
@@ -290,7 +282,6 @@ public class SlideMenu {
 		content.setLayoutParams(parm);
 		enableDisableViewGroup((LinearLayout) parent.findViewById(android.R.id.content).getParent(), true);
 
-		menuShown = false;
 	}
 
 	//originally: http://stackoverflow.com/questions/5418510/disable-the-touch-events-for-all-the-views
