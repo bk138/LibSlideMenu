@@ -2,6 +2,7 @@
 package com.coboltforge.slidemenuexample;
 
 import com.coboltforge.slidemenu.SlideMenu;
+import com.coboltforge.slidemenu.SlideMenu.SlideMenuItem;
 import com.coboltforge.slidemenu.SlideMenuInterface.OnSlideMenuItemClickListener;
 
 import android.app.Activity;
@@ -15,6 +16,7 @@ import android.widget.Toast;
 public class MainActivity extends Activity implements OnSlideMenuItemClickListener {
 
 	private SlideMenu slidemenu;
+	private final static int MYITEMID = 42;
 
 	
 	@Override
@@ -26,6 +28,13 @@ public class MainActivity extends Activity implements OnSlideMenuItemClickListen
 		// add slide menu
 		slidemenu = new SlideMenu(this, R.menu.slide, this, 333);
 		slidemenu.setHeaderImage(R.drawable.ic_launcher);
+		
+		// this demontrates how to dynamically add menu items
+		SlideMenuItem item = new SlideMenuItem();
+		item.id = MYITEMID;
+		item.icon = getResources().getDrawable(R.drawable.ic_launcher);
+		item.label = "Dynamically added item";
+		slidemenu.addMenuItem(item);
 		
 		// connect the fallback button in case there is no ActionBar
 		Button b = (Button) findViewById(R.id.buttonMenu);
@@ -54,6 +63,9 @@ public class MainActivity extends Activity implements OnSlideMenuItemClickListen
 			break;
 		case R.id.item_four:
 			Toast.makeText(this, "Item four selected", Toast.LENGTH_SHORT).show();
+			break;
+		case MYITEMID:
+			Toast.makeText(this, "Dynamically added item selected", Toast.LENGTH_SHORT).show();
 			break;
 		}
 		

@@ -30,6 +30,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.XmlResourceParser;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,20 +49,22 @@ import android.widget.TextView;
 
 public class SlideMenu {
 	
+	public static class SlideMenuItem {
+		public int id;
+		public Drawable icon;
+		public String label;
+	}
+	
 	// a simple adapter
-	public static class SlideMenuAdapter extends ArrayAdapter<SlideMenu.SlideMenuAdapter.MenuDesc> {
+	private static class SlideMenuAdapter extends ArrayAdapter<SlideMenuItem> {
 		Activity act;
-		SlideMenu.SlideMenuAdapter.MenuDesc[] items;
-		class MenuItem {
+		SlideMenuItem[] items;
+		class MenuItemHolder {
 			public TextView label;
 			public ImageView icon;
 		}
-		static class MenuDesc {
-			public int id;
-			public int icon;
-			public String label;
-		}
-		public SlideMenuAdapter(Activity act, SlideMenu.SlideMenuAdapter.MenuDesc[] items) {
+		
+		public SlideMenuAdapter(Activity act, SlideMenuItem[] items) {
 			super(act, R.id.menu_label, items);
 			this.act = act;
 			this.items = items;
@@ -72,16 +75,16 @@ public class SlideMenu {
 			if (rowView == null) {
 				LayoutInflater inflater = act.getLayoutInflater();
 				rowView = inflater.inflate(R.layout.slidemenu_listitem, null);
-				MenuItem viewHolder = new MenuItem();
+				MenuItemHolder viewHolder = new MenuItemHolder();
 				viewHolder.label = (TextView) rowView.findViewById(R.id.menu_label);
 				viewHolder.icon = (ImageView) rowView.findViewById(R.id.menu_icon);
 				rowView.setTag(viewHolder);
 			}
 
-			MenuItem holder = (MenuItem) rowView.getTag();
+			MenuItemHolder holder = (MenuItemHolder) rowView.getTag();
 			String s = items[position].label;
 			holder.label.setText(s);
-			holder.icon.setImageResource(items[position].icon);
+			holder.icon.setImageDrawable(items[position].icon);
 
 			return rowView;
 		}
@@ -98,15 +101,13 @@ public class SlideMenu {
 	private TranslateAnimation slideRightAnim;
 	private TranslateAnimation slideMenuLeftAnim;
 	private TranslateAnimation slideContentLeftAnim;
-
-
 	
-	private ArrayList<SlideMenuAdapter.MenuDesc> menuItems;
+	private ArrayList<SlideMenuItem> menuItemList;
 	private SlideMenuInterface.OnSlideMenuItemClickListener callback;
 	
 	
-	/**
-	 * 
+	/** 
+	 * Constructs a SlideMenu with the given menu XML. 
 	 * @param act The calling activity.
 	 * @param menuResource Menu resource identifier.
 	 * @param cb Callback to be invoked on menu item click.
@@ -131,6 +132,17 @@ public class SlideMenu {
 		parseXml(menuResource);
 	}
 	
+	/** 
+	 * Constructs an emtpy SlideMenu.
+	 * @param act The calling activity.
+	 * @param cb Callback to be invoked on menu item click.
+	 * @param slideDuration Slide in/out duration in milliseconds.
+	 */
+	public SlideMenu(Activity act, SlideMenuInterface.OnSlideMenuItemClickListener cb, int slideDuration) {
+		this(act, 0, cb, slideDuration);
+	}
+	
+	
 	/**
 	 * Sets an image to displayed on top of the menu.
 	 * @param imageResource
@@ -139,6 +151,22 @@ public class SlideMenu {
 		headerImageRes = imageResource;
 	}
 	
+	
+	/**
+	 * Dynamically adds a menu item.
+	 * @param item
+	 */
+	public void addMenuItem(SlideMenuItem item) {
+		menuItemList.add(item);
+	}
+	
+	
+	/**
+	 * Empties the SlideMenu.
+	 */
+	public void clearMenuItems() {
+		menuItemList.clear();
+	}
 	
 	
 	//call this in your onCreate() for screen rotation
@@ -216,7 +244,7 @@ public class SlideMenu {
 		
 		// connect the menu's listview
 		ListView list = (ListView) act.findViewById(R.id.menu_listview);
-		SlideMenuAdapter.MenuDesc[] items = menuItems.toArray(new SlideMenuAdapter.MenuDesc[menuItems.size()]);
+		SlideMenuItem[] items = menuItemList.toArray(new SlideMenuItem[menuItemList.size()]);
 		SlideMenuAdapter adap = new SlideMenuAdapter(act, items);
 		list.setAdapter(adap);
 		list.setOnItemClickListener(new OnItemClickListener() {
@@ -224,7 +252,7 @@ public class SlideMenu {
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
 				if(callback != null)					
-					callback.onSlideMenuItemClick(menuItems.get(position).id);
+					callback.onSlideMenuItemClick(menuItemList.get(position).id);
 				
 				hide();
 			}
@@ -292,8 +320,7 @@ public class SlideMenu {
 	// credit where credits due!
 	private void parseXml(int menu){
 		
-		menuItems = new ArrayList<SlideMenuAdapter.MenuDesc>();
-		
+		menuItemList = new ArrayList<SlideMenuItem>();
 		
 		try{
 			XmlResourceParser xpp = act.getResources().getXml(menu);
@@ -315,12 +342,12 @@ public class SlideMenu {
 						String iconId = xpp.getAttributeValue("http://schemas.android.com/apk/res/android", "icon");
 						String resId = xpp.getAttributeValue("http://schemas.android.com/apk/res/android", "id");
 						
-						SlideMenuAdapter.MenuDesc item = new SlideMenuAdapter.MenuDesc();
+						SlideMenuItem item = new SlideMenuItem();
 						item.id = Integer.valueOf(resId.replace("@", ""));
-						item.icon = Integer.valueOf(iconId.replace("@", ""));
+						item.icon = act.getResources().getDrawable(Integer.valueOf(iconId.replace("@", "")));
 						item.label = resourceIdToString(textId);
 						
-						menuItems.add(item);
+						menuItemList.add(item);
 					}
 					
 				}
@@ -339,17 +366,13 @@ public class SlideMenu {
 	
 	
 	private String resourceIdToString(String text){
-		
 		if(!text.contains("@")){
 			return text;
 		} else {
-									
 			String id = text.replace("@", "");
-									
 			return act.getResources().getString(Integer.valueOf(id));
 			
 		}
-		
 	}
 	
 }
