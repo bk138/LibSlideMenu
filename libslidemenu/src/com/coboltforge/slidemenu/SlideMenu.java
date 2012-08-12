@@ -31,7 +31,7 @@ import android.content.Context;
 import android.content.res.XmlResourceParser;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.os.Parcel;
+import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.util.TypedValue;
@@ -50,6 +50,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 public class SlideMenu extends LinearLayout {
+	
+	// keys for saving/restoring instance state
+	private final static String KEY_MENUSHOWN = "menuWasShown";
+	private final static String KEY_STATUSBARHEIGHT = "statusBarHeight";
+	private final static String KEY_SUPERSTATE = "superState";
+
 	
 	public static class SlideMenuItem {
 		public int id;
@@ -405,11 +411,22 @@ public class SlideMenu extends LinearLayout {
 	@Override 
 	protected void onRestoreInstanceState(Parcelable state)	{
 		try{
-			SavedState ss = (SavedState)state;
-			super.onRestoreInstanceState(ss.getSuperState());
+			
+			if (state instanceof Bundle) {
+				Bundle bundle = (Bundle) state;
+				
+				statusHeight = bundle.getInt(KEY_STATUSBARHEIGHT);
 
-			if (ss.menuWasShown)
-				show(false); // show without animation
+				if(bundle.getBoolean(KEY_MENUSHOWN))
+					show(false); // show without animation
+				
+				super.onRestoreInstanceState(bundle.getParcelable(KEY_SUPERSTATE));
+				
+				return;
+			}
+			
+			super.onRestoreInstanceState(state);
+			
 		}
 		catch(NullPointerException e) { 
 			// in case the menu was not declared via XML but added from code
@@ -420,31 +437,13 @@ public class SlideMenu extends LinearLayout {
 
 	@Override 
 	protected Parcelable onSaveInstanceState()	{
-	    Parcelable superState = super.onSaveInstanceState();
-	    SavedState ss = new SavedState(superState);
+		Bundle bundle = new Bundle();
+		bundle.putParcelable(KEY_SUPERSTATE, super.onSaveInstanceState());
+		bundle.putBoolean(KEY_MENUSHOWN, menuShown);
+		bundle.putInt(KEY_STATUSBARHEIGHT, statusHeight);
 
-	    ss.menuWasShown = menuShown;
-
-	    return ss;
+		return bundle;
 	}
 
-	private static class SavedState extends BaseSavedState {
-	    boolean menuWasShown;
-
-	    SavedState(Parcelable superState) {
-	        super(superState);
-	    }
-
-	    private SavedState(Parcel in) {
-	        super(in);
-	        menuWasShown = (in.readInt() == 1);
-	    }
-
-	    @Override
-	    public void writeToParcel(Parcel out, int flags) {
-	        super.writeToParcel(out, flags);
-	        out.writeInt(menuWasShown ? 1 : 0);
-	    }
-	}
 	
 }
