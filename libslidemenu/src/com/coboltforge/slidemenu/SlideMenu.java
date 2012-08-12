@@ -213,29 +213,22 @@ public class SlideMenu extends LinearLayout {
 	 */
 	public void show() {
 		/*
-		 *  only have to adopt to status height if there is no action bar,
-		 *  neither native nor from support library!
+		 *  We have to adopt to status bar height in most cases,
+		 *  but not if there is a support actionbar!
 		 */
 		try {
-			Method getActionBar = act.getClass().getMethod("getActionBar", (Class[])null);
-			Object ab = getActionBar.invoke(act, (Object[])null);
-			ab.toString(); // check for null
-		} catch (Exception e) {
-			try {
-			// there is no native actionbar, try the support one
-			Method getActionBar = act.getClass().getMethod("getSupportActionBar", (Class[])null);
-			Object sab = getActionBar.invoke(act, (Object[])null);
+			Method getSupportActionBar = act.getClass().getMethod("getSupportActionBar", (Class[])null);
+			Object sab = getSupportActionBar.invoke(act, (Object[])null);
 			sab.toString(); // check for null
-			}
-			catch(Exception es) {
-				// there also is no support action bar!
-				Rect r = new Rect();
-				Window window = act.getWindow();
-				window.getDecorView().getWindowVisibleDisplayFrame(r);
-				statusHeight = r.top;
-			}
 		}
-
+		catch(Exception es) {
+			// there is no support action bar!
+			Rect r = new Rect();
+			Window window = act.getWindow();
+			window.getDecorView().getWindowVisibleDisplayFrame(r);
+			statusHeight = r.top;
+		}
+		
 		/*
 		 * phew, finally!
 		 */
