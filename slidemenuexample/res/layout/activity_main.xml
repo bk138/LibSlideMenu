@@ -2,6 +2,11 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" >
 
+    <com.coboltforge.slidemenu.SlideMenu
+        android:id="@+id/slideMenu"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+    
     <Button
         android:id="@+id/buttonMenu"
         android:layout_width="wrap_content"

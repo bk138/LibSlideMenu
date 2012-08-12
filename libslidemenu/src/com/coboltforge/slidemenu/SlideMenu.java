@@ -31,10 +31,12 @@ import android.content.Context;
 import android.content.res.XmlResourceParser;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.animation.TranslateAnimation;
@@ -47,7 +49,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class SlideMenu {
+public class SlideMenu extends LinearLayout {
 	
 	public static class SlideMenuItem {
 		public int id;
@@ -89,7 +91,8 @@ public class SlideMenu {
 			return rowView;
 		}
 	}
-
+	
+	private static boolean menuShown = false;
 	private int statusHeight;
 	private static View menu;
 	private static LinearLayout content;
@@ -104,6 +107,24 @@ public class SlideMenu {
 	private ArrayList<SlideMenuItem> menuItemList;
 	private SlideMenuInterface.OnSlideMenuItemClickListener callback;
 	
+	/**
+	 * Constructor used by the inflation apparatus.
+	 * To be able to use the SlideMenu, call the {@link #init init()} method.
+	 * @param context
+	 */
+	public SlideMenu(Context context) {
+		super(context);
+	}
+	
+	/**
+	 * Constructor used by the inflation apparatus.
+	 * To be able to use the SlideMenu, call the {@link #init init()} method.
+	 * @param attrs
+	 */
+	public SlideMenu(Context context, AttributeSet attrs) {
+		super(context, attrs);
+	}
+	
 	
 	/** 
 	 * Constructs a SlideMenu with the given menu XML. 
@@ -113,6 +134,29 @@ public class SlideMenu {
 	 * @param slideDuration Slide in/out duration in milliseconds.
 	 */
 	public SlideMenu(Activity act, int menuResource, SlideMenuInterface.OnSlideMenuItemClickListener cb, int slideDuration) {
+		super(act);
+		init(act, menuResource, cb, slideDuration);
+	}
+	
+	/** 
+	 * Constructs an empty SlideMenu.
+	 * @param act The calling activity.
+	 * @param cb Callback to be invoked on menu item click.
+	 * @param slideDuration Slide in/out duration in milliseconds.
+	 */
+	public SlideMenu(Activity act, SlideMenuInterface.OnSlideMenuItemClickListener cb, int slideDuration) {
+		this(act, 0, cb, slideDuration);
+	}
+	
+	/** 
+	 * If inflated from XML, initializes the SlideMenu.
+	 * @param act The calling activity.
+	 * @param menuResource Menu resource identifier, can be 0 for an empty SlideMenu.
+	 * @param cb Callback to be invoked on menu item click.
+	 * @param slideDuration Slide in/out duration in milliseconds.
+	 */
+	public void init(Activity act, int menuResource, SlideMenuInterface.OnSlideMenuItemClickListener cb, int slideDuration) {
+		
 		this.act = act;
 		this.callback = cb;
 	
@@ -131,19 +175,8 @@ public class SlideMenu {
 		parseXml(menuResource);
 	}
 	
-	/** 
-	 * Constructs an emtpy SlideMenu.
-	 * @param act The calling activity.
-	 * @param cb Callback to be invoked on menu item click.
-	 * @param slideDuration Slide in/out duration in milliseconds.
-	 */
-	public SlideMenu(Activity act, SlideMenuInterface.OnSlideMenuItemClickListener cb, int slideDuration) {
-		this(act, 0, cb, slideDuration);
-	}
-	
-	
 	/**
-	 * Sets an image to displayed on top of the menu.
+	 * Sets an optional image to be displayed on top of the menu.
 	 * @param imageResource
 	 */
 	public void setHeaderImage(int imageResource) {
@@ -264,6 +297,7 @@ public class SlideMenu {
 		});
 		enableDisableViewGroup((LinearLayout) parent.findViewById(android.R.id.content).getParent(), false);
 
+		menuShown = true;
 	}
 	
 	
@@ -282,6 +316,7 @@ public class SlideMenu {
 		content.setLayoutParams(parm);
 		enableDisableViewGroup((LinearLayout) parent.findViewById(android.R.id.content).getParent(), true);
 
+		menuShown = false;
 	}
 
 	//originally: http://stackoverflow.com/questions/5418510/disable-the-touch-events-for-all-the-views
@@ -364,6 +399,52 @@ public class SlideMenu {
 			return act.getResources().getString(Integer.valueOf(id));
 			
 		}
+	}
+	
+	
+	@Override 
+	protected void onRestoreInstanceState(Parcelable state)	{
+		try{
+			SavedState ss = (SavedState)state;
+			super.onRestoreInstanceState(ss.getSuperState());
+
+			if (ss.menuWasShown)
+				show(false); // show without animation
+		}
+		catch(NullPointerException e) { 
+			// in case the menu was not declared via XML but added from code
+		}
+	}
+	
+	
+
+	@Override 
+	protected Parcelable onSaveInstanceState()	{
+	    Parcelable superState = super.onSaveInstanceState();
+	    SavedState ss = new SavedState(superState);
+
+	    ss.menuWasShown = menuShown;
+
+	    return ss;
+	}
+
+	private static class SavedState extends BaseSavedState {
+	    boolean menuWasShown;
+
+	    SavedState(Parcelable superState) {
+	        super(superState);
+	    }
+
+	    private SavedState(Parcel in) {
+	        super(in);
+	        menuWasShown = (in.readInt() == 1);
+	    }
+
+	    @Override
+	    public void writeToParcel(Parcel out, int flags) {
+	        super.writeToParcel(out, flags);
+	        out.writeInt(menuWasShown ? 1 : 0);
+	    }
 	}
 	
 }

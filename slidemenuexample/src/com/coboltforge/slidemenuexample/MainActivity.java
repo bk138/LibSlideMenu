@@ -25,11 +25,20 @@ public class MainActivity extends Activity implements OnSlideMenuItemClickListen
 		
 		setContentView(R.layout.activity_main);
 		
-		// add slide menu
-		slidemenu = new SlideMenu(this, R.menu.slide, this, 333);
+		/*
+		 * There are two ways to add the slide menu: 
+		 * From code or to inflate it from XML (then you have to declare it in the activities layout XML)
+		 */
+		// this is from code. no XML declaration necessary, but you won't get state restored after rotation.
+//		slidemenu = new SlideMenu(this, R.menu.slide, this, 333);
+		// this inflates the menu from XML. open/closed state will be restored after rotation, but you'll have to call init.
+		slidemenu = (SlideMenu) findViewById(R.id.slideMenu);
+		slidemenu.init(this, R.menu.slide, this, 333);
+		
+		// set optional header image
 		slidemenu.setHeaderImage(R.drawable.ic_launcher);
 		
-		// this demontrates how to dynamically add menu items
+		// this demonstrates how to dynamically add menu items
 		SlideMenuItem item = new SlideMenuItem();
 		item.id = MYITEMID;
 		item.icon = getResources().getDrawable(R.drawable.ic_launcher);
