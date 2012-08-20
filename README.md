@@ -1,3 +1,5 @@
+[![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=dontmind&url=https://github.com/bk138/LibSlideMenu&title=LibSlideMenu&language=&tags=github&category=software)
+
 A sliding menu for Android, very much like the Google+ and Facebook apps have.
 That is, this one slides the activity title / action bar out of the way as well!
 
