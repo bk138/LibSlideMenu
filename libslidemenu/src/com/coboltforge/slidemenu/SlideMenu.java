@@ -207,7 +207,7 @@ public class SlideMenu extends LinearLayout {
 	}
 	
 	
-	
+
 	/**
 	 * Slide the menu in.
 	 */
@@ -220,21 +220,23 @@ public class SlideMenu extends LinearLayout {
 			Method getSupportActionBar = act.getClass().getMethod("getSupportActionBar", (Class[])null);
 			Object sab = getSupportActionBar.invoke(act, (Object[])null);
 			sab.toString(); // check for null
+
+			if (android.os.Build.VERSION.SDK_INT >= 11) {
+				// over api level 11? add the margin
+				applyStatusbarOffset();
+			}
 		}
 		catch(Exception es) {
 			// there is no support action bar!
-			Rect r = new Rect();
-			Window window = act.getWindow();
-			window.getDecorView().getWindowVisibleDisplayFrame(r);
-			statusHeight = r.top;
+			applyStatusbarOffset();
 		}
-		
+
 		/*
 		 * phew, finally!
 		 */
 		this.show(true);
 	}
-	
+
 	
 	
 	private void show(boolean animate) {
@@ -318,6 +320,15 @@ public class SlideMenu extends LinearLayout {
 		menuShown = false;
 	}
 
+	
+	private void applyStatusbarOffset() {
+		Rect r = new Rect();
+		Window window = act.getWindow();
+		window.getDecorView().getWindowVisibleDisplayFrame(r);
+		statusHeight = r.top;
+	}
+	
+	
 	//originally: http://stackoverflow.com/questions/5418510/disable-the-touch-events-for-all-the-views
 	//modified for the needs here
 	private void enableDisableViewGroup(ViewGroup viewGroup, boolean enabled) {
