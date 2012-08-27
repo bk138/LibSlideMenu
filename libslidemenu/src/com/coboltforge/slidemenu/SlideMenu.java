@@ -252,7 +252,7 @@ public class SlideMenu extends LinearLayout {
 			content.startAnimation(slideRightAnim);
 		
 		// add the slide menu to parent
-		parent = (FrameLayout) content.getParent();
+		parent = (FrameLayout) act.getWindow().getDecorView();
 		LayoutInflater inflater = (LayoutInflater) act.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		menu = inflater.inflate(R.layout.slidemenu, null);
 		FrameLayout.LayoutParams lays = new FrameLayout.LayoutParams(-1, -1, 3);
