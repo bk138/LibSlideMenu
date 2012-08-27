@@ -101,7 +101,7 @@ public class SlideMenu extends LinearLayout {
 	private static boolean menuShown = false;
 	private int statusHeight;
 	private static View menu;
-	private static LinearLayout content;
+	private static ViewGroup content;
 	private static FrameLayout parent;
 	private static int menuSize;
 	private Activity act;
@@ -242,7 +242,17 @@ public class SlideMenu extends LinearLayout {
 	private void show(boolean animate) {
 		
 		// modify content layout params
-		content = ((LinearLayout) act.findViewById(android.R.id.content).getParent());
+		try {
+			content = ((LinearLayout) act.findViewById(android.R.id.content).getParent());
+		}
+		catch(ClassCastException e) {
+			/*
+			 * When there is no title bar (android:theme="@android:style/Theme.NoTitleBar"),
+			 * the android.R.id.content FrameLayout is directly attached to the DecorView,
+			 * without the intermediate LinearLayout that holds the titlebar plus content.
+			 */
+			content = (FrameLayout) act.findViewById(android.R.id.content);
+		}
 		FrameLayout.LayoutParams parm = new FrameLayout.LayoutParams(-1, -1, 3);
 		parm.setMargins(menuSize, 0, -menuSize, 0);
 		content.setLayoutParams(parm);
@@ -296,7 +306,7 @@ public class SlideMenu extends LinearLayout {
 				SlideMenu.this.hide();
 			}
 		});
-		enableDisableViewGroup((LinearLayout) parent.findViewById(android.R.id.content).getParent(), false);
+		enableDisableViewGroup(content, false);
 
 		menuShown = true;
 	}
@@ -315,7 +325,7 @@ public class SlideMenu extends LinearLayout {
 		FrameLayout.LayoutParams parm = (FrameLayout.LayoutParams) content.getLayoutParams();
 		parm.setMargins(0, 0, 0, 0);
 		content.setLayoutParams(parm);
-		enableDisableViewGroup((LinearLayout) parent.findViewById(android.R.id.content).getParent(), true);
+		enableDisableViewGroup(content, true);
 
 		menuShown = false;
 	}
