@@ -39,6 +39,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
 import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -179,6 +181,22 @@ public class SlideMenu extends LinearLayout {
 		slideContentLeftAnim = new TranslateAnimation(menuSize, 0, 0, 0);
 		slideContentLeftAnim.setDuration(slideDuration);
 		slideContentLeftAnim.setFillAfter(true);
+		slideContentLeftAnim.setAnimationListener(new AnimationListener() {
+			
+			@Override
+			public void onAnimationStart(Animation animation) {
+			}
+			
+			@Override
+			public void onAnimationRepeat(Animation animation) {
+			}
+			
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				parent.requestLayout();
+				parent.invalidate();
+			}
+		});
 
 		// and get our menu
 		parseXml(menuResource);
