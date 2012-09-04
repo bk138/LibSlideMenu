@@ -215,6 +215,18 @@ public class SlideMenu extends LinearLayout {
 	 * Slide the menu in.
 	 */
 	public void show() {
+		this.show(true);
+	}
+
+	/**
+	 * Set the menu to shown status without displaying any slide animation. 
+	 */
+	public void setAsShown() {
+		this.show(false);
+	}
+	
+	private void show(boolean animate) {
+		
 		/*
 		 *  We have to adopt to status bar height in most cases,
 		 *  but not if there is a support actionbar!
@@ -234,15 +246,6 @@ public class SlideMenu extends LinearLayout {
 			applyStatusbarOffset();
 		}
 
-		/*
-		 * phew, finally!
-		 */
-		this.show(true);
-	}
-
-	
-	
-	private void show(boolean animate) {
 		
 		// modify content layout params
 		try {
