@@ -35,6 +35,9 @@ public class MainActivity extends Activity implements OnSlideMenuItemClickListen
 		slidemenu = (SlideMenu) findViewById(R.id.slideMenu);
 		slidemenu.init(this, R.menu.slide, this, 333);
 		
+		// this can set the menu to initially shown instead of hidden
+//		slidemenu.setAsShown(); 
+		
 		// set optional header image
 		slidemenu.setHeaderImage(R.drawable.ic_launcher);
 		
