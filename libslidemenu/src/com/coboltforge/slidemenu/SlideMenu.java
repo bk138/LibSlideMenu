@@ -109,6 +109,7 @@ public class SlideMenu extends LinearLayout {
 	private TranslateAnimation slideRightAnim;
 	private TranslateAnimation slideMenuLeftAnim;
 	private TranslateAnimation slideContentLeftAnim;
+	private boolean dontAnimateContent = false;
 	
 	private ArrayList<SlideMenuItem> menuItemList;
 	private SlideMenuInterface.OnSlideMenuItemClickListener callback;
@@ -155,7 +156,7 @@ public class SlideMenu extends LinearLayout {
 	}
 	
 	/** 
-	 * If inflated from XML, initializes the SlideMenu.
+	 * Initializes the SlideMenu.
 	 * @param act The calling activity.
 	 * @param menuResource Menu resource identifier, can be 0 for an empty SlideMenu.
 	 * @param cb Callback to be invoked on menu item click.
@@ -179,6 +180,10 @@ public class SlideMenu extends LinearLayout {
 		slideContentLeftAnim = new TranslateAnimation(menuSize, 0, 0, 0);
 		slideContentLeftAnim.setDuration(slideDuration);
 		slideContentLeftAnim.setFillAfter(true);
+		
+		// content does not animate back on xperia neo
+		if (android.os.Build.MODEL.equalsIgnoreCase("MT11i"))
+			dontAnimateContent = true;
 
 		// and get our menu
 		parseXml(menuResource);
@@ -246,8 +251,6 @@ public class SlideMenu extends LinearLayout {
 			applyStatusbarOffset();
 		}
 
-		
-		// modify content layout params
 		try {
 			content = ((LinearLayout) act.findViewById(android.R.id.content).getParent());
 		}
@@ -259,13 +262,17 @@ public class SlideMenu extends LinearLayout {
 			 */
 			content = (FrameLayout) act.findViewById(android.R.id.content);
 		}
-		FrameLayout.LayoutParams parm = new FrameLayout.LayoutParams(-1, -1, 3);
-		parm.setMargins(menuSize, 0, -menuSize, 0);
-		content.setLayoutParams(parm);
-		
-		// animation for smooth slide-out
-		if(animate)
-			content.startAnimation(slideRightAnim);
+
+		if(!dontAnimateContent) {
+			// modify content layout params
+			FrameLayout.LayoutParams parm = new FrameLayout.LayoutParams(-1, -1, 3);
+			parm.setMargins(menuSize, 0, -menuSize, 0);
+			content.setLayoutParams(parm);
+
+			// animation for smooth slide-out
+			if(animate)
+				content.startAnimation(slideRightAnim);
+		}
 		
 		// add the slide menu to parent
 		parent = (FrameLayout) content.getParent();
@@ -326,11 +333,14 @@ public class SlideMenu extends LinearLayout {
 		menu.startAnimation(slideMenuLeftAnim);
 		parent.removeView(menu);
 
-		content.startAnimation(slideContentLeftAnim);
+		if(!dontAnimateContent) {
+			content.startAnimation(slideContentLeftAnim);
 
-		FrameLayout.LayoutParams parm = (FrameLayout.LayoutParams) content.getLayoutParams();
-		parm.setMargins(0, 0, 0, 0);
-		content.setLayoutParams(parm);
+			FrameLayout.LayoutParams parm = (FrameLayout.LayoutParams) content.getLayoutParams();
+			parm.setMargins(0, 0, 0, 0);
+			content.setLayoutParams(parm);
+		}
+		
 		enableDisableViewGroup(content, true);
 
 		menuShown = false;
