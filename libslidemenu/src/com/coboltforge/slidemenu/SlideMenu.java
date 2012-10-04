@@ -174,10 +174,10 @@ public class SlideMenu extends LinearLayout {
 		slideRightAnim.setDuration(slideDuration);
 		slideRightAnim.setFillAfter(true);
 		slideMenuLeftAnim = new TranslateAnimation(0, -menuSize, 0, 0);
-		slideMenuLeftAnim.setDuration(slideDuration);
+		slideMenuLeftAnim.setDuration(slideDuration*3/2);
 		slideMenuLeftAnim.setFillAfter(true);
 		slideContentLeftAnim = new TranslateAnimation(menuSize, 0, 0, 0);
-		slideContentLeftAnim.setDuration(slideDuration);
+		slideContentLeftAnim.setDuration(slideDuration*3/2);
 		slideContentLeftAnim.setFillAfter(true);
 
 		// and get our menu
