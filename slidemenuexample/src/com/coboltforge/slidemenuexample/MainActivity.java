@@ -39,7 +39,7 @@ public class MainActivity extends Activity implements OnSlideMenuItemClickListen
 //		slidemenu.setAsShown(); 
 		
 		// set optional header image
-		slidemenu.setHeaderImage(R.drawable.ic_launcher);
+		slidemenu.setHeaderImage(getResources().getDrawable(R.drawable.ic_launcher));
 		
 		// this demonstrates how to dynamically add menu items
 		SlideMenuItem item = new SlideMenuItem();
