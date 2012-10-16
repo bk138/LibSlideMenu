@@ -30,6 +30,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.XmlResourceParser;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -67,15 +68,18 @@ public class SlideMenu extends LinearLayout {
 	private static class SlideMenuAdapter extends ArrayAdapter<SlideMenuItem> {
 		Activity act;
 		SlideMenuItem[] items;
+		Typeface itemFont;
+		
 		class MenuItemHolder {
 			public TextView label;
 			public ImageView icon;
 		}
 		
-		public SlideMenuAdapter(Activity act, SlideMenuItem[] items) {
+		public SlideMenuAdapter(Activity act, SlideMenuItem[] items, Typeface itemFont) {
 			super(act, R.id.menu_label, items);
 			this.act = act;
 			this.items = items;
+			this.itemFont = itemFont;
 		}
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
@@ -85,6 +89,8 @@ public class SlideMenu extends LinearLayout {
 				rowView = inflater.inflate(R.layout.slidemenu_listitem, null);
 				MenuItemHolder viewHolder = new MenuItemHolder();
 				viewHolder.label = (TextView) rowView.findViewById(R.id.menu_label);
+				if(itemFont != null) 
+					viewHolder.label.setTypeface(itemFont);
 				viewHolder.icon = (ImageView) rowView.findViewById(R.id.menu_icon);
 				rowView.setTag(viewHolder);
 			}
@@ -106,6 +112,7 @@ public class SlideMenu extends LinearLayout {
 	private static int menuSize;
 	private Activity act;
 	private Drawable headerImage;
+	private Typeface font;
 	private TranslateAnimation slideRightAnim;
 	private TranslateAnimation slideMenuLeftAnim;
 	private TranslateAnimation slideContentLeftAnim;
@@ -190,6 +197,14 @@ public class SlideMenu extends LinearLayout {
 	 */
 	public void setHeaderImage(Drawable d) {
 		headerImage = d;
+	}
+	
+	/**
+	 * Optionally sets the font for the menu items.
+	 * @param f A font.
+	 */
+	public void setFont(Typeface f) {
+		font = f;
 	}
 	
 	
@@ -288,7 +303,7 @@ public class SlideMenu extends LinearLayout {
 		// connect the menu's listview
 		ListView list = (ListView) act.findViewById(R.id.menu_listview);
 		SlideMenuItem[] items = menuItemList.toArray(new SlideMenuItem[menuItemList.size()]);
-		SlideMenuAdapter adap = new SlideMenuAdapter(act, items);
+		SlideMenuAdapter adap = new SlideMenuAdapter(act, items, font);
 		list.setAdapter(adap);
 		list.setOnItemClickListener(new OnItemClickListener() {
 			@Override
