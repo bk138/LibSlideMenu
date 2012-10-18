@@ -105,7 +105,7 @@ public class SlideMenu extends LinearLayout {
 	}
 	
 	private static boolean menuShown = false;
-	private int statusHeight;
+	private int statusHeight = -1;
 	private static View menu;
 	private static ViewGroup content;
 	private static FrameLayout parent;
@@ -253,14 +253,13 @@ public class SlideMenu extends LinearLayout {
 
 			if (android.os.Build.VERSION.SDK_INT >= 11) {
 				// over api level 11? add the margin
-				applyStatusbarOffset();
+				getStatusbarHeight();
 			}
 		}
 		catch(Exception es) {
 			// there is no support action bar!
-			applyStatusbarOffset();
+			getStatusbarHeight();
 		}
-
 		
 		// modify content layout params
 		try {
@@ -352,11 +351,15 @@ public class SlideMenu extends LinearLayout {
 	}
 
 	
-	private void applyStatusbarOffset() {
-		Rect r = new Rect();
-		Window window = act.getWindow();
-		window.getDecorView().getWindowVisibleDisplayFrame(r);
-		statusHeight = r.top;
+	private void getStatusbarHeight() {
+		// Only do this if not already set.
+		// Especially when called from within onCreate(), this does not return the true values. 
+		if(statusHeight == -1) {
+			Rect r = new Rect();
+			Window window = act.getWindow();
+			window.getDecorView().getWindowVisibleDisplayFrame(r);
+			statusHeight = r.top;
+		}
 	}
 	
 	
