@@ -392,6 +392,9 @@ public class SlideMenu extends LinearLayout {
 		
 		menuItemList = new ArrayList<SlideMenuItem>();
 		
+		// use 0 id to indicate no menu (as specified in JavaDoc)
+		if(menu == 0) return;
+		
 		try{
 			XmlResourceParser xpp = act.getResources().getXml(menu);
 			
