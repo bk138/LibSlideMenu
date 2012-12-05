@@ -1,11 +1,11 @@
 /*
  * A sliding menu for Android, very much like the Google+ and Facebook apps have.
- * 
+ *
  * Copyright (C) 2012 CoboltForge
- * 
+ *
  * Based upon the great work done by stackoverflow user Scirocco (http://stackoverflow.com/a/11367825/361413), thanks a lot!
  * The XML parsing code comes from https://github.com/darvds/RibbonMenu, thanks!
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,12 +26,14 @@ import java.util.ArrayList;
 
 import org.xmlpull.v1.XmlPullParser;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.XmlResourceParser;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
@@ -51,30 +53,30 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 public class SlideMenu extends LinearLayout {
-	
+
 	// keys for saving/restoring instance state
 	private final static String KEY_MENUSHOWN = "menuWasShown";
 	private final static String KEY_STATUSBARHEIGHT = "statusBarHeight";
 	private final static String KEY_SUPERSTATE = "superState";
 
-	
+
 	public static class SlideMenuItem {
 		public int id;
 		public Drawable icon;
 		public String label;
 	}
-	
+
 	// a simple adapter
 	private static class SlideMenuAdapter extends ArrayAdapter<SlideMenuItem> {
 		Activity act;
 		SlideMenuItem[] items;
 		Typeface itemFont;
-		
+
 		class MenuItemHolder {
 			public TextView label;
 			public ImageView icon;
 		}
-		
+
 		public SlideMenuAdapter(Activity act, SlideMenuItem[] items, Typeface itemFont) {
 			super(act, R.id.menu_label, items);
 			this.act = act;
@@ -89,7 +91,7 @@ public class SlideMenu extends LinearLayout {
 				rowView = inflater.inflate(R.layout.slidemenu_listitem, null);
 				MenuItemHolder viewHolder = new MenuItemHolder();
 				viewHolder.label = (TextView) rowView.findViewById(R.id.menu_label);
-				if(itemFont != null) 
+				if(itemFont != null)
 					viewHolder.label.setTypeface(itemFont);
 				viewHolder.icon = (ImageView) rowView.findViewById(R.id.menu_icon);
 				rowView.setTag(viewHolder);
@@ -103,8 +105,11 @@ public class SlideMenu extends LinearLayout {
 			return rowView;
 		}
 	}
-	
-	private static boolean menuShown = false;
+
+	// this tells whether the menu is currently shown
+	private boolean menuIsShown = false;
+	// this just tells whether the menu was ever shown
+	private boolean menuWasShown = false;
 	private int statusHeight = -1;
 	private static View menu;
 	private static ViewGroup content;
@@ -116,10 +121,10 @@ public class SlideMenu extends LinearLayout {
 	private TranslateAnimation slideRightAnim;
 	private TranslateAnimation slideMenuLeftAnim;
 	private TranslateAnimation slideContentLeftAnim;
-	
+
 	private ArrayList<SlideMenuItem> menuItemList;
 	private SlideMenuInterface.OnSlideMenuItemClickListener callback;
-	
+
 	/**
 	 * Constructor used by the inflation apparatus.
 	 * To be able to use the SlideMenu, call the {@link #init init()} method.
@@ -128,7 +133,7 @@ public class SlideMenu extends LinearLayout {
 	public SlideMenu(Context context) {
 		super(context);
 	}
-	
+
 	/**
 	 * Constructor used by the inflation apparatus.
 	 * To be able to use the SlideMenu, call the {@link #init init()} method.
@@ -137,10 +142,10 @@ public class SlideMenu extends LinearLayout {
 	public SlideMenu(Context context, AttributeSet attrs) {
 		super(context, attrs);
 	}
-	
-	
-	/** 
-	 * Constructs a SlideMenu with the given menu XML. 
+
+
+	/**
+	 * Constructs a SlideMenu with the given menu XML.
 	 * @param act The calling activity.
 	 * @param menuResource Menu resource identifier.
 	 * @param cb Callback to be invoked on menu item click.
@@ -150,8 +155,8 @@ public class SlideMenu extends LinearLayout {
 		super(act);
 		init(act, menuResource, cb, slideDuration);
 	}
-	
-	/** 
+
+	/**
 	 * Constructs an empty SlideMenu.
 	 * @param act The calling activity.
 	 * @param cb Callback to be invoked on menu item click.
@@ -160,8 +165,8 @@ public class SlideMenu extends LinearLayout {
 	public SlideMenu(Activity act, SlideMenuInterface.OnSlideMenuItemClickListener cb, int slideDuration) {
 		this(act, 0, cb, slideDuration);
 	}
-	
-	/** 
+
+	/**
 	 * If inflated from XML, initializes the SlideMenu.
 	 * @param act The calling activity.
 	 * @param menuResource Menu resource identifier, can be 0 for an empty SlideMenu.
@@ -169,13 +174,13 @@ public class SlideMenu extends LinearLayout {
 	 * @param slideDuration Slide in/out duration in milliseconds.
 	 */
 	public void init(Activity act, int menuResource, SlideMenuInterface.OnSlideMenuItemClickListener cb, int slideDuration) {
-		
+
 		this.act = act;
 		this.callback = cb;
-	
+
 		// set size
 		menuSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 250, act.getResources().getDisplayMetrics());
-		
+
 		// create animations accordingly
 		slideRightAnim = new TranslateAnimation(-menuSize, 0, 0, 0);
 		slideRightAnim.setDuration(slideDuration);
@@ -190,7 +195,7 @@ public class SlideMenu extends LinearLayout {
 		// and get our menu
 		parseXml(menuResource);
 	}
-	
+
 	/**
 	 * Sets an optional image to be displayed on top of the menu.
 	 * @param d
@@ -198,7 +203,7 @@ public class SlideMenu extends LinearLayout {
 	public void setHeaderImage(Drawable d) {
 		headerImage = d;
 	}
-	
+
 	/**
 	 * Optionally sets the font for the menu items.
 	 * @param f A font.
@@ -206,8 +211,8 @@ public class SlideMenu extends LinearLayout {
 	public void setFont(Typeface f) {
 		font = f;
 	}
-	
-	
+
+
 	/**
 	 * Dynamically adds a menu item.
 	 * @param item
@@ -215,16 +220,16 @@ public class SlideMenu extends LinearLayout {
 	public void addMenuItem(SlideMenuItem item) {
 		menuItemList.add(item);
 	}
-	
-	
+
+
 	/**
 	 * Empties the SlideMenu.
 	 */
 	public void clearMenuItems() {
 		menuItemList.clear();
 	}
-	
-	
+
+
 
 	/**
 	 * Slide the menu in.
@@ -234,14 +239,15 @@ public class SlideMenu extends LinearLayout {
 	}
 
 	/**
-	 * Set the menu to shown status without displaying any slide animation. 
+	 * Set the menu to shown status without displaying any slide animation.
 	 */
 	public void setAsShown() {
 		this.show(false);
 	}
-	
+
+	@SuppressLint("NewApi")
 	private void show(boolean animate) {
-		
+
 		/*
 		 *  We have to adopt to status bar height in most cases,
 		 *  but not if there is a support actionbar!
@@ -260,7 +266,7 @@ public class SlideMenu extends LinearLayout {
 			// there is no support action bar!
 			getStatusbarHeight();
 		}
-		
+
 		// modify content layout params
 		try {
 			content = ((LinearLayout) act.findViewById(android.R.id.content).getParent());
@@ -276,11 +282,15 @@ public class SlideMenu extends LinearLayout {
 		FrameLayout.LayoutParams parm = new FrameLayout.LayoutParams(-1, -1, 3);
 		parm.setMargins(menuSize, 0, -menuSize, 0);
 		content.setLayoutParams(parm);
-		
+
 		// animation for smooth slide-out
 		if(animate)
 			content.startAnimation(slideRightAnim);
-		
+
+		// quirk for sony xperia devices, shouldn't hurt on others
+		if(Build.VERSION.SDK_INT >= 11 && Build.MANUFACTURER.contains("Sony") && menuWasShown)
+			content.setX(menuSize);
+
 		// add the slide menu to parent
 		parent = (FrameLayout) content.getParent();
 		LayoutInflater inflater = (LayoutInflater) act.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -289,16 +299,16 @@ public class SlideMenu extends LinearLayout {
 		lays.setMargins(0, statusHeight, 0, 0);
 		menu.setLayoutParams(lays);
 		parent.addView(menu);
-		
+
 		// set header
 		try {
-			ImageView header = (ImageView) act.findViewById(R.id.menu_header); 
+			ImageView header = (ImageView) act.findViewById(R.id.menu_header);
 			header.setImageDrawable(headerImage);
 		}
 		catch(Exception e) {
 			// not found
 		}
-		
+
 		// connect the menu's listview
 		ListView list = (ListView) act.findViewById(R.id.menu_listview);
 		SlideMenuItem[] items = menuItemList.toArray(new SlideMenuItem[menuItemList.size()]);
@@ -308,18 +318,18 @@ public class SlideMenu extends LinearLayout {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-				if(callback != null)					
+				if(callback != null)
 					callback.onSlideMenuItemClick(menuItemList.get(position).id);
-				
+
 				hide();
 			}
 		});
-		
+
 		// slide menu in
 		if(animate)
 			menu.startAnimation(slideRightAnim);
-		
-		
+
+
 		menu.findViewById(R.id.overlay).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -328,14 +338,16 @@ public class SlideMenu extends LinearLayout {
 		});
 		enableDisableViewGroup(content, false);
 
-		menuShown = true;
+		menuIsShown = true;
+		menuWasShown = true;
 	}
-	
-	
-	
+
+
+
 	/**
 	 * Slide the menu out.
 	 */
+	@SuppressLint("NewApi")
 	public void hide() {
 		menu.startAnimation(slideMenuLeftAnim);
 		parent.removeView(menu);
@@ -347,13 +359,17 @@ public class SlideMenu extends LinearLayout {
 		content.setLayoutParams(parm);
 		enableDisableViewGroup(content, true);
 
-		menuShown = false;
+		// quirk for sony xperia devices, shouldn't hurt on others
+		if(Build.VERSION.SDK_INT >= 11 && Build.MANUFACTURER.contains("Sony"))
+			content.setX(0);
+
+		menuIsShown = false;
 	}
 
-	
+
 	private void getStatusbarHeight() {
 		// Only do this if not already set.
-		// Especially when called from within onCreate(), this does not return the true values. 
+		// Especially when called from within onCreate(), this does not return the true values.
 		if(statusHeight == -1) {
 			Rect r = new Rect();
 			Window window = act.getWindow();
@@ -361,8 +377,8 @@ public class SlideMenu extends LinearLayout {
 			statusHeight = r.top;
 		}
 	}
-	
-	
+
+
 	//originally: http://stackoverflow.com/questions/5418510/disable-the-touch-events-for-all-the-views
 	//modified for the needs here
 	private void enableDisableViewGroup(ViewGroup viewGroup, boolean enabled) {
@@ -385,106 +401,106 @@ public class SlideMenu extends LinearLayout {
 			}
 		}
 	}
-	
+
 	// originally: https://github.com/darvds/RibbonMenu
 	// credit where credits due!
 	private void parseXml(int menu){
-		
+
 		menuItemList = new ArrayList<SlideMenuItem>();
-		
+
 		// use 0 id to indicate no menu (as specified in JavaDoc)
 		if(menu == 0) return;
-		
+
 		try{
 			XmlResourceParser xpp = act.getResources().getXml(menu);
-			
+
 			xpp.next();
 			int eventType = xpp.getEventType();
-			
-			
+
+
 			while(eventType != XmlPullParser.END_DOCUMENT){
-				
+
 				if(eventType == XmlPullParser.START_TAG){
-					
+
 					String elemName = xpp.getName();
-					
+
 					if(elemName.equals("item")){
-											
-						
+
+
 						String textId = xpp.getAttributeValue("http://schemas.android.com/apk/res/android", "title");
 						String iconId = xpp.getAttributeValue("http://schemas.android.com/apk/res/android", "icon");
 						String resId = xpp.getAttributeValue("http://schemas.android.com/apk/res/android", "id");
-						
+
 						SlideMenuItem item = new SlideMenuItem();
 						item.id = Integer.valueOf(resId.replace("@", ""));
 						item.icon = act.getResources().getDrawable(Integer.valueOf(iconId.replace("@", "")));
 						item.label = resourceIdToString(textId);
-						
+
 						menuItemList.add(item);
 					}
-					
+
 				}
-				
+
 				eventType = xpp.next();
-				
+
 			}
-			
-			
+
+
 		} catch(Exception e){
 			e.printStackTrace();
 		}
-		
+
 	}
-	
-	
-	
+
+
+
 	private String resourceIdToString(String text){
 		if(!text.contains("@")){
 			return text;
 		} else {
 			String id = text.replace("@", "");
 			return act.getResources().getString(Integer.valueOf(id));
-			
+
 		}
 	}
-	
-	
-	@Override 
+
+
+	@Override
 	protected void onRestoreInstanceState(Parcelable state)	{
 		try{
-			
+
 			if (state instanceof Bundle) {
 				Bundle bundle = (Bundle) state;
-				
+
 				statusHeight = bundle.getInt(KEY_STATUSBARHEIGHT);
 
 				if(bundle.getBoolean(KEY_MENUSHOWN))
 					show(false); // show without animation
-				
+
 				super.onRestoreInstanceState(bundle.getParcelable(KEY_SUPERSTATE));
-				
+
 				return;
 			}
-			
+
 			super.onRestoreInstanceState(state);
-			
+
 		}
-		catch(NullPointerException e) { 
+		catch(NullPointerException e) {
 			// in case the menu was not declared via XML but added from code
 		}
 	}
-	
-	
 
-	@Override 
+
+
+	@Override
 	protected Parcelable onSaveInstanceState()	{
 		Bundle bundle = new Bundle();
 		bundle.putParcelable(KEY_SUPERSTATE, super.onSaveInstanceState());
-		bundle.putBoolean(KEY_MENUSHOWN, menuShown);
+		bundle.putBoolean(KEY_MENUSHOWN, menuIsShown);
 		bundle.putInt(KEY_STATUSBARHEIGHT, statusHeight);
 
 		return bundle;
 	}
 
-	
+
 }
