@@ -293,6 +293,21 @@ public class SlideMenu extends LinearLayout {
 
 		// add the slide menu to parent
 		parent = (FrameLayout) content.getParent();
+
+		try{
+			parent = (FrameLayout) content.getParent();
+		}catch(ClassCastException e){
+			/*
+			 * Most probably a LinearLayout, at least on Galaxy S3.
+			 * https://github.com/bk138/LibSlideMenu/issues/12
+			 */
+			LinearLayout realParent = (LinearLayout) content.getParent();
+			parent = new FrameLayout(act);
+			realParent.addView(parent, 0); // add FrameLayout to real parent of content
+			realParent.removeView(content); // remove content from real parent
+			parent.addView(content); // add content to FrameLayout
+		}
+
 		LayoutInflater inflater = (LayoutInflater) act.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		menu = inflater.inflate(R.layout.slidemenu, null);
 		FrameLayout.LayoutParams lays = new FrameLayout.LayoutParams(-1, -1, 3);
