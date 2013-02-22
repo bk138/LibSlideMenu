@@ -448,7 +448,9 @@ public class SlideMenu extends LinearLayout {
 
 						SlideMenuItem item = new SlideMenuItem();
 						item.id = Integer.valueOf(resId.replace("@", ""));
-						item.icon = act.getResources().getDrawable(Integer.valueOf(iconId.replace("@", "")));
+						if (iconId != null) {
+							item.icon = act.getResources().getDrawable(Integer.valueOf(iconId.replace("@", "")));
+						}
 						item.label = resourceIdToString(textId);
 
 						menuItemList.add(item);
