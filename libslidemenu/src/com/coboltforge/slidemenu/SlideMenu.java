@@ -183,17 +183,38 @@ public class SlideMenu extends LinearLayout {
 
 		// create animations accordingly
 		slideRightAnim = new TranslateAnimation(-menuSize, 0, 0, 0);
-		slideRightAnim.setDuration(slideDuration);
 		slideRightAnim.setFillAfter(true);
 		slideMenuLeftAnim = new TranslateAnimation(0, -menuSize, 0, 0);
-		slideMenuLeftAnim.setDuration(slideDuration*3/2);
 		slideMenuLeftAnim.setFillAfter(true);
 		slideContentLeftAnim = new TranslateAnimation(menuSize, 0, 0, 0);
-		slideContentLeftAnim.setDuration(slideDuration*3/2);
 		slideContentLeftAnim.setFillAfter(true);
-
+		setAnimationDuration(slideDuration);
 		// and get our menu
 		parseXml(menuResource);
+	}
+	
+	/**
+	 * Set how long slide animation should be
+	 * @see TranslateAnimation#setDuration(long)
+	 * @param slideDuration
+	 *                     How long to set the slide animation
+	 */
+	public void setAnimationDuration(long slideDuration) {
+		slideRightAnim.setDuration(slideDuration);
+		slideMenuLeftAnim.setDuration(slideDuration*3/2);
+		slideContentLeftAnim.setDuration(slideDuration*3/2);
+	}
+	
+	/**
+	 * Set an Interpolator for the slide animation.
+	 * @see TranslateAnimation#setInterpolator(Interpolator)
+	 * @param i
+	 *         The {@link Interpolator} object to set.
+	 */
+	public void setAnimationInterpolator(Interpolator i) {
+		slideRightAnim.setInterpolator(i);
+		slideMenuLeftAnim.setInterpolator(i);
+		slideContentLeftAnim.setInterpolator(i);
 	}
 
 	/**
