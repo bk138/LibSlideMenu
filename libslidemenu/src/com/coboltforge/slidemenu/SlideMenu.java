@@ -42,6 +42,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.animation.Interpolator;
 import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -192,7 +193,7 @@ public class SlideMenu extends LinearLayout {
 		// and get our menu
 		parseXml(menuResource);
 	}
-	
+
 	/**
 	 * Set how long slide animation should be
 	 * @see TranslateAnimation#setDuration(long)
@@ -204,7 +205,7 @@ public class SlideMenu extends LinearLayout {
 		slideMenuLeftAnim.setDuration(slideDuration*3/2);
 		slideContentLeftAnim.setDuration(slideDuration*3/2);
 	}
-	
+
 	/**
 	 * Set an Interpolator for the slide animation.
 	 * @see TranslateAnimation#setInterpolator(Interpolator)
