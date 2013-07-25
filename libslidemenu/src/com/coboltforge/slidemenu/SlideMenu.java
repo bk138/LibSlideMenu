@@ -309,8 +309,8 @@ public class SlideMenu extends LinearLayout {
 		if(animate)
 			content.startAnimation(slideRightAnim);
 
-		// quirk for sony xperia devices, shouldn't hurt on others
-		if(Build.VERSION.SDK_INT >= 11 && Build.MANUFACTURER.contains("Sony") && menuWasShown)
+		// quirk for sony xperia devices on ICS only, shouldn't hurt on others
+		if(Build.VERSION.SDK_INT >= 11 && Build.VERSION.SDK_INT <= 15  && Build.MANUFACTURER.contains("Sony") && menuWasShown)
 			content.setX(menuSize);
 
 		// add the slide menu to parent
@@ -394,8 +394,8 @@ public class SlideMenu extends LinearLayout {
 		content.setLayoutParams(parm);
 		enableDisableViewGroup(content, true);
 
-		// quirk for sony xperia devices, shouldn't hurt on others
-		if(Build.VERSION.SDK_INT >= 11 && Build.MANUFACTURER.contains("Sony"))
+		// quirk for sony xperia devices on ICS only, shouldn't hurt on others
+		if(Build.VERSION.SDK_INT >= 11 && Build.VERSION.SDK_INT <= 15 && Build.MANUFACTURER.contains("Sony"))
 			content.setX(0);
 
 		menuIsShown = false;
