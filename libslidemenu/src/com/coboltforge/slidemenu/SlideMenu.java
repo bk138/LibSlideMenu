@@ -123,6 +123,7 @@ public class SlideMenu extends LinearLayout {
 	private TranslateAnimation slideMenuLeftAnim;
 	private TranslateAnimation slideContentLeftAnim;
 
+
 	private ArrayList<SlideMenuItem> menuItemList;
 	private SlideMenuInterface.OnSlideMenuItemClickListener callback;
 
@@ -192,7 +193,9 @@ public class SlideMenu extends LinearLayout {
 		setAnimationDuration(slideDuration);
 		// and get our menu
 		parseXml(menuResource);
+
 	}
+
 
 	/**
 	 * Set how long slide animation should be
@@ -299,8 +302,12 @@ public class SlideMenu extends LinearLayout {
 			 * the android.R.id.content FrameLayout is directly attached to the DecorView,
 			 * without the intermediate LinearLayout that holds the titlebar plus content.
 			 */
-			content = (FrameLayout) act.findViewById(android.R.id.content);
+			if(Build.VERSION.SDK_INT < 18)
+				content = (ViewGroup) act.findViewById(android.R.id.content);
+			else
+				content = (ViewGroup) act.findViewById(android.R.id.content).getParent(); //FIXME? what about the corner cases (fullscreen etc)
 		}
+
 		FrameLayout.LayoutParams parm = new FrameLayout.LayoutParams(-1, -1, 3);
 		parm.setMargins(menuSize, 0, -menuSize, 0);
 		content.setLayoutParams(parm);
@@ -328,11 +335,14 @@ public class SlideMenu extends LinearLayout {
 			parent.addView(content); // add content to FrameLayout
 		}
 
+
 		LayoutInflater inflater = (LayoutInflater) act.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		menu = inflater.inflate(R.layout.slidemenu, null);
+
 		FrameLayout.LayoutParams lays = new FrameLayout.LayoutParams(-1, -1, 3);
 		lays.setMargins(0, statusHeight, 0, 0);
 		menu.setLayoutParams(lays);
+
 		parent.addView(menu);
 
 		// set header
