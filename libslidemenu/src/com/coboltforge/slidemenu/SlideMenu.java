@@ -321,7 +321,7 @@ public class SlideMenu extends LinearLayout {
 			 * Most probably a LinearLayout, at least on Galaxy S3.
 			 * https://github.com/bk138/LibSlideMenu/issues/12
 			 */
-			ViewGroup realParent = (ViewGroup) content.getParent();
+			LinearLayout realParent = (LinearLayout) content.getParent();
 			parent = new FrameLayout(act);
 			realParent.addView(parent, 0); // add FrameLayout to real parent of content
 			realParent.removeView(content); // remove content from real parent
